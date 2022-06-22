@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\PostRequest;
+use Illuminate\Support\Str;
+
 
 class PostController extends Controller
 {
@@ -16,7 +19,7 @@ class PostController extends Controller
     public function index()
     {
 
-        $posts = Post::all();
+        $posts = Post::orderByDesc('id')->get();
 
         return view('admin.posts.index', compact('posts'));
     }
@@ -34,12 +37,18 @@ class PostController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Request\PostRequest  $request
      * @return \Illuminate\Http\Response
+     * 
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
         $request->all();
+        $val_data = $request->validated();
+        $slug = Str::slug($request->title, '-');
+        $val_data['slug'] = $slug;
+        Post::create($val_data);
+        return redirect()->route('admin.posts.index')->with('message', 'Post created');
     }
 
     /**
@@ -50,7 +59,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        //
+        return view('admin.posts.show', compact('post'));
     }
 
     /**
@@ -61,19 +70,26 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        //
+        return view('admin.posts.edit', compact('post'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Request\PostRequest   $request
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post)
+    public function update(PostRequest $request, Post $post)
     {
-        //
+        // ($request->all());
+        $val_data = $request->validated();
+
+        $slug = Str::slug($request->title, '-');
+        $val_data['slug'] = $slug;
+
+        $post->update($val_data);
+        return redirect()->route('admin.posts.index')->with('message', '$post->title updated');
     }
 
     /**
@@ -84,6 +100,7 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        //
+        $post->delete();
+        return redirect()->route('admin.posts.index')->with('message', '$post->title deleted');
     }
 }

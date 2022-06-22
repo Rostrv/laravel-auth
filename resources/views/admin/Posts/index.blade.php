@@ -2,6 +2,10 @@
 Lato Admin
 @section('content')
 <div class="container">
+  <div class="d-flex justify-content-between py-4">
+    <h1>All Posts</h1>
+    <div><a href="{{route('admin.posts.create')}}" class="btn btn-primary">Add post</a></div>
+  </div>
     
     <table class="table table-striped table-inverse table-responsive">
         <thead class="thead-inverse">
@@ -21,7 +25,38 @@ Lato Admin
             <td>{{$post->title}}</td>
             <td>{{$post->slug}}</td>
             <td><img width ="150px"src="{{$post->cover_image}}" alt="Cover image {{$post->title}}"></td>
-            <td>view-edit-delete</td>
+            <td>
+              <a class="btn btn-primary" href="{{route('admin.posts.show', $post->id)}}">View</a>
+              <a class="btn btn-secondary" href="{{route('admin.posts.edit', $post->id)}}">Edit</a>  
+
+              <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#delete-post-{{$post->id}}">Delete</button>
+
+              <div class="modal" tabindex="-1" id="delete-post-{{$post->id}}" aria-labelledby="modelTitle-{{$post->id}}">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Delete post</h5>
+                      <button type="button" class="close" data-dismiss="modal" data-target aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <p>Are you sure?</p>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      <form action="{{route('admin.posts.destroy', $post->id)}}" method="post">
+                      @csrf
+                      @method('DELETE')
+                      <button type="submit" class="btn btn-danger">Delete</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+
+            </td>
           </tr>
           @empty
           <tr>
